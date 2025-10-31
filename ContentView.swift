@@ -21,7 +21,6 @@ let menuItems: [MenuItem] = [
 ]
 
 
-
 // --- ¡NUEVA VISTA! ---
 // Esta es la vista para el fondo de noche con estrellas
 struct NightSkyView: View {
@@ -56,31 +55,26 @@ struct NightSkyView: View {
 
 
 // --- 3. La Vista Principal de la Aplicación (Menú) ---
-// ¡CAMBIO IMPORTANTE!
-// Renombré 'ContentView' a 'contenttview' para que 'inicioview'
-// pueda llamarla correctamente.
 struct contenttview: View {
     
-    // --- ¡CAMBIO 1! ---
-    // Leemos la variable guardada. Si cambia en OpcionesView,
-    // esta vista se enterará y se redibujará.
     @AppStorage("isDarkMode") private var isDarkMode: Bool = false
     
+    // --- ¡CAMBIO 1: DEFINICIÓN DE LA CUADRÍCULA (GRID)! ---
+    // Esto crea columnas flexibles.
+    // En iPhone: 1 columna.
+    // En iPad: 2, 3 o 4 columnas, dependiendo del espacio.
+    private let columns: [GridItem] = [
+        GridItem(.adaptive(minimum: 280))
+    ]
+    
     var body: some View {
-        // NavigationStack es esencial para navegar entre vistas
-        // NOTA: 'inicioview' ya te proporciona un NavigationStack,
-        // por lo que este es técnicamente redundante, pero no hace daño
-        // y es bueno tenerlo para las previsualizaciones.
-        
         ZStack {
             
-            // --- ¡CAMBIO GRANDE! ---
-            // Aquí decidimos qué fondo mostrar basado en 'isDarkMode'
+            // --- Fondo (Modo Claro/Oscuro) ---
             if isDarkMode {
                 NightSkyView()
                     .ignoresSafeArea()
             } else {
-                // --- FONDO (Alegre cielo a pasto) ---
                 LinearGradient(
                     colors: [Color(red: 0.6, green: 0.9, blue: 1.0), Color(red: 0.7, green: 1.0, blue: 0.7)], // Sky blue to grass green
                     startPoint: .top,
@@ -89,50 +83,46 @@ struct contenttview: View {
                 .ignoresSafeArea()
             }
             
-            // --- CONTENIDO (El Menú Deslizable) ---
+            // --- ¡CAMBIO 2: De VStack a LazyVGrid! ---
             ScrollView {
-                VStack(spacing: 20) {
+                // Usamos LazyVGrid en lugar de VStack
+                LazyVGrid(columns: columns, spacing: 25) { // Más espaciado entre tarjetas
                     ForEach(menuItems) { item in
-                        // Decidimos qué vista cargar según el título del item
                         
-                        // --- ¡CAMBIO 2! ---
-                        // Modificamos el 'if/else' para incluir "Ajustes"
-                        
+                        // La lógica de navegación sigue igual
                         if item.title == "Construye la Palabra" {
                             NavigationLink(destination: BuildWordGameView()) {
-                                MenuItemRow(item: item)
+                                // ¡CAMBIO 3: Usamos la nueva tarjeta!
+                                MenuItemCard(item: item)
                             }
                             .buttonStyle(PlainButtonStyle())
                         } else if item.title == "Cartas Emocionales" {
                             NavigationLink(destination: EmotionalFacesGameView()) {
-                                MenuItemRow(item: item)
+                                MenuItemCard(item: item)
                             }
                             .buttonStyle(PlainButtonStyle())
                             
-                        // ¡ESTA ES LA NUEVA PARTE!
                         } else if item.title == "Ajustes" {
                             NavigationLink(destination: OpcionesView()) {
-                                MenuItemRow(item: item)
+                                MenuItemCard(item: item)
                             }
                             .buttonStyle(PlainButtonStyle())
                             
                         } else {
-                            // Para opciones que no son juegos (o juegos aún no implementados)
                             Button(action: {
                                 print("Has tocado \(item.title)")
                             }) {
-                                MenuItemRow(item: item)
+                                MenuItemCard(item: item)
                             }
                             .buttonStyle(PlainButtonStyle())
                         }
                     }
                 }
-                .padding()
+                .padding(25) // Padding general para la cuadrícula
                 .padding(.top, 10)
             }
         }
-        // --- Estilo de la Barra de Navegación (Título "Lecturio") ---
-        // .navigationTitle("") // Se quita para usar el .principal
+        // --- Estilos de la Barra de Navegación (sin cambios) ---
         .toolbar {
             ToolbarItem(placement: .principal) {
                 Text("Lecturio")
@@ -142,9 +132,6 @@ struct contenttview: View {
                     .shadow(radius: 2) // Soft shadow for title
             }
         }
-        
-        // --- ¡CAMBIO EN EL TOOLBAR! ---
-        // Ahora el fondo de la barra de navegación también cambia
         .toolbarBackground(
             isDarkMode ?
                 // Fondo oscuro para la barra
@@ -153,62 +140,54 @@ struct contenttview: View {
                 LinearGradient(colors: [Color(red: 0.6, green: 0.9, blue: 1.0), .cyan], startPoint: .top, endPoint: .bottom),
             for: .navigationBar)
         .toolbarBackground(.visible, for: .navigationBar)
-        
-        // --- ¡CAMBIO 3! ---
-        // Este modificador aplica el modo oscuro (o lo quita)
-        // a *todo* el NavigationStack (toda la app).
         .preferredColorScheme(isDarkMode ? .dark : nil)
-        
-        // Importante: Oculta el botón de "Atrás" para que no puedan
-        // regresar a la pantalla de inicio de sesión (inicioview).
         .navigationBarBackButtonHidden(true)
     }
 }
 
-// --- 4. Vista para cada Fila del Menú (Aparencia) ---
-struct MenuItemRow: View {
+// --- ¡CAMBIO 4: De "Fila" (Row) a "Tarjeta" (Card)! ---
+struct MenuItemCard: View { // Renombrado de MenuItemRow
     let item: MenuItem
     
     // Estado para la animación de balanceo
     @State private var isAnimating = false
     
     var body: some View {
-        HStack(spacing: 20) {
-            Image(systemName: item.iconName)
-                .font(.system(size: 30, weight: .bold))
-                .foregroundColor(item.color)
-                .frame(width: 40)
-                // Animación de balanceo
-                .rotationEffect(.degrees(isAnimating ? -10 : 10))
+        // --- ¡CAMBIO 5: De HStack a VStack! ---
+        // El contenido ahora es vertical (icono arriba, texto abajo)
+        VStack(spacing: 20) {
+            Spacer() // Empuja el contenido hacia el centro
             
-            Text(item.title)
-                .font(.system(.title2, design: .rounded))
-                .fontWeight(.bold)
+            Image(systemName: item.iconName)
+                // --- ¡CAMBIO 6: Icono mucho más grande! ---
+                .font(.system(size: 60, weight: .bold)) // Mucho más grande
+                .foregroundColor(item.color)
+                .frame(height: 65) // Altura fija para alinear
+                // Animación de balanceo
+                .rotationEffect(.degrees(isAnimating ? -8 : 8)) // Un poco menos de rotación
             
             Spacer()
             
-            Image(systemName: "chevron.right")
-                .font(.system(.body, weight: .bold))
-                .foregroundColor(.gray.opacity(0.4))
+            Text(item.title)
+                // --- ¡CAMBIO 7: Texto más grande y centrado! ---
+                .font(.system(.title, design: .rounded)) // Más grande
+                .fontWeight(.bold)
+                .multilineTextAlignment(.center)
+                .lineLimit(2) // Permite hasta 2 líneas
+                .frame(height: 60) // Altura fija para alinear texto
+            
+            Spacer()
         }
-        .padding(22)
-        
-        // --- ¡CAMBIO 4! ---
-        // Colores adaptativos para el modo oscuro
-        
-        // Antes: .foregroundColor(.black.opacity(0.8))
-        // Ahora: .primary se vuelve blanco en modo oscuro
+        .frame(minWidth: 0, maxWidth: .infinity) // Ocupa el ancho de la columna
+        .frame(height: 220) // Altura fija para todas las tarjetas
+        .padding(15) // Padding interno
         .foregroundColor(.primary.opacity(0.8))
-        
-        // Antes: .background(Color.white.opacity(0.85))
-        // Ahora: Color(.systemBackground) se vuelve negro/gris oscuro en modo oscuro
         .background(Color(.systemBackground).opacity(0.85)) // Fondo "nube"
-        
-        .cornerRadius(25) // Esquinas muy redondeadas
+        .cornerRadius(30) // Esquinas más redondeadas
         .shadow(color: .black.opacity(0.15), radius: 8, x: 0, y: 4)
-        // Dispara la animación
         .onAppear {
-            withAnimation(.easeInOut(duration: 0.7).repeatForever(autoreverses: true)) {
+            // Animación
+            withAnimation(.easeInOut(duration: 0.8).repeatForever(autoreverses: true)) {
                 isAnimating = true
             }
         }
@@ -217,10 +196,13 @@ struct MenuItemRow: View {
 
 
 // --- Preview para 'contenttview' ---
-// Se actualizó para previsualizar 'contenttview'
-// dentro de un NavigationStack para que el título funcione.
 #Preview {
     NavigationStack {
         contenttview()
     }
+    // Así puedes probarlo en un iPad:
+    .previewDevice("iPad Pro (11-inch) (4th generation)")
+    .previewDisplayName("iPad Preview")
 }
+
+
