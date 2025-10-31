@@ -8,25 +8,14 @@
 import SwiftUI
 import SwiftData
 
+
 @main
-struct LecturioApp: App {
-    var sharedModelContainer: ModelContainer = {
-        let schema = Schema([
-            Item.self,
-        ])
-        let modelConfiguration = ModelConfiguration(schema: schema, isStoredInMemoryOnly: false)
-
-        do {
-            return try ModelContainer(for: schema, configurations: [modelConfiguration])
-        } catch {
-            fatalError("Could not create ModelContainer: \(error)")
-        }
-    }()
-
+struct TuApp: App { // El nombre de tu app puede ser diferente
     var body: some Scene {
         WindowGroup {
-            ContentView()
+            // Aquí le decimos a la app que arranque
+            // con tu nueva vista de inicio
+            inicioview()
         }
-        .modelContainer(sharedModelContainer)
     }
 }

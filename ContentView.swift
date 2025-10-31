@@ -10,24 +10,17 @@ struct MenuItem: Identifiable {
 
 // --- 2. Los Datos del Menú ---
 let menuItems: [MenuItem] = [
-    // Opci ones de juegos/actividades
+    // Opciones de juegos/actividades
+    MenuItem(title: "Cuento", iconName: "book.fill", color: .mint),
     MenuItem(title: "Construye la Palabra", iconName: "character.textbox", color: .mint),
     MenuItem(title: "Cartas Emocionales", iconName: "heart.text.square.fill", color: .pink),
-    MenuItem(title: "Juegos de Animales y Sonido", iconName: "pawprint.fill", color: .brown),
-    MenuItem(title: "Juegos de Deportes y Movimiento", iconName: "sportscourt.fill", color: .cyan),
+    MenuItem(title: "Preguntas Retadoras", iconName: "star.fill", color: .brown),
     MenuItem(title: "Colorea y Aprende", iconName: "paintbrush.fill", color: .yellow),
-    
-    // Opciones estándar de la app
     MenuItem(title: "Mi Perfil", iconName: "person.fill", color: .blue),
-    MenuItem(title: "Favoritos", iconName: "star.fill", color: .orange),
     MenuItem(title: "Ajustes", iconName: "gearshape.fill", color: .gray),
-    // Moví "Cerrar Sesión" a la pantalla de Ajustes
-    // MenuItem(title: "Cerrar Sesión", iconName: "arrow.right.to.line", color: .purple)
 ]
 
-// --- Vistas de Destino (Marcadores de posición) ---
-// Dejamos este para que el primer botón funcione.
-// 'EmotionalFacesGameView' y 'BuildWordGameView' deben 
+
 
 // --- ¡NUEVA VISTA! ---
 // Esta es la vista para el fondo de noche con estrellas
@@ -63,7 +56,10 @@ struct NightSkyView: View {
 
 
 // --- 3. La Vista Principal de la Aplicación (Menú) ---
-struct ContentView: View {
+// ¡CAMBIO IMPORTANTE!
+// Renombré 'ContentView' a 'contenttview' para que 'inicioview'
+// pueda llamarla correctamente.
+struct contenttview: View {
     
     // --- ¡CAMBIO 1! ---
     // Leemos la variable guardada. Si cambia en OpcionesView,
@@ -72,93 +68,100 @@ struct ContentView: View {
     
     var body: some View {
         // NavigationStack es esencial para navegar entre vistas
-        NavigationStack {
-            ZStack {
-                
-                // --- ¡CAMBIO GRANDE! ---
-                // Aquí decidimos qué fondo mostrar basado en 'isDarkMode'
-                if isDarkMode {
-                    NightSkyView()
-                        .ignoresSafeArea()
-                } else {
-                    // --- FONDO (Alegre cielo a pasto) ---
-                    LinearGradient(
-                        colors: [Color(red: 0.6, green: 0.9, blue: 1.0), Color(red: 0.7, green: 1.0, blue: 0.7)], // Sky blue to grass green
-                        startPoint: .top,
-                        endPoint: .bottom
-                    )
+        // NOTA: 'inicioview' ya te proporciona un NavigationStack,
+        // por lo que este es técnicamente redundante, pero no hace daño
+        // y es bueno tenerlo para las previsualizaciones.
+        
+        ZStack {
+            
+            // --- ¡CAMBIO GRANDE! ---
+            // Aquí decidimos qué fondo mostrar basado en 'isDarkMode'
+            if isDarkMode {
+                NightSkyView()
                     .ignoresSafeArea()
-                }
-                
-                // --- CONTENIDO (El Menú Deslizable) ---
-                ScrollView {
-                    VStack(spacing: 20) {
-                        ForEach(menuItems) { item in
-                            // Decidimos qué vista cargar según el título del item
-                            
-                            // --- ¡CAMBIO 2! ---
-                            // Modificamos el 'if/else' para incluir "Ajustes"
-                            
-                            if item.title == "Construye la Palabra" {
-                                NavigationLink(destination: BuildWordGameView()) {
-                                    MenuItemRow(item: item)
-                                }
-                                .buttonStyle(PlainButtonStyle())
-                            } else if item.title == "Cartas Emocionales" {
-                                NavigationLink(destination: EmotionalFacesGameView()) {
-                                    MenuItemRow(item: item)
-                                }
-                                .buttonStyle(PlainButtonStyle())
-                                
-                            // ¡ESTA ES LA NUEVA PARTE!
-                            } else if item.title == "Ajustes" {
-                                NavigationLink(destination: OpcionesView()) {
-                                    MenuItemRow(item: item)
-                                }
-                                .buttonStyle(PlainButtonStyle())
-                                
-                            } else {
-                                // Para opciones que no son juegos (o juegos aún no implementados)
-                                Button(action: {
-                                    print("Has tocado \(item.title)")
-                                }) {
-                                    MenuItemRow(item: item)
-                                }
-                                .buttonStyle(PlainButtonStyle())
-                            }
-                        }
-                    }
-                    .padding()
-                    .padding(.top, 10)
-                }
-            }
-            // --- Estilo de la Barra de Navegación (Título "Lecturio") ---
-            .navigationTitle("")
-            .toolbar {
-                ToolbarItem(placement: .principal) {
-                    Text("Lecturio")
-                        .font(.system(.largeTitle, design: .rounded))
-                        .fontWeight(.heavy) // Bolder
-                        .foregroundColor(.white.opacity(0.9)) // Soft white
-                        .shadow(radius: 2) // Soft shadow for title
-                }
+            } else {
+                // --- FONDO (Alegre cielo a pasto) ---
+                LinearGradient(
+                    colors: [Color(red: 0.6, green: 0.9, blue: 1.0), Color(red: 0.7, green: 1.0, blue: 0.7)], // Sky blue to grass green
+                    startPoint: .top,
+                    endPoint: .bottom
+                )
+                .ignoresSafeArea()
             }
             
-            // --- ¡CAMBIO EN EL TOOLBAR! ---
-            // Ahora el fondo de la barra de navegación también cambia
-            .toolbarBackground(
-                isDarkMode ?
-                    // Fondo oscuro para la barra
-                    LinearGradient(colors: [.black.opacity(0.8), .blue.opacity(0.3)], startPoint: .top, endPoint: .bottom) :
-                    // Fondo claro (el que tenías)
-                    LinearGradient(colors: [Color(red: 0.6, green: 0.9, blue: 1.0), .cyan], startPoint: .top, endPoint: .bottom),
-                for: .navigationBar)
-            .toolbarBackground(.visible, for: .navigationBar)
+            // --- CONTENIDO (El Menú Deslizable) ---
+            ScrollView {
+                VStack(spacing: 20) {
+                    ForEach(menuItems) { item in
+                        // Decidimos qué vista cargar según el título del item
+                        
+                        // --- ¡CAMBIO 2! ---
+                        // Modificamos el 'if/else' para incluir "Ajustes"
+                        
+                        if item.title == "Construye la Palabra" {
+                            NavigationLink(destination: BuildWordGameView()) {
+                                MenuItemRow(item: item)
+                            }
+                            .buttonStyle(PlainButtonStyle())
+                        } else if item.title == "Cartas Emocionales" {
+                            NavigationLink(destination: EmotionalFacesGameView()) {
+                                MenuItemRow(item: item)
+                            }
+                            .buttonStyle(PlainButtonStyle())
+                            
+                        // ¡ESTA ES LA NUEVA PARTE!
+                        } else if item.title == "Ajustes" {
+                            NavigationLink(destination: OpcionesView()) {
+                                MenuItemRow(item: item)
+                            }
+                            .buttonStyle(PlainButtonStyle())
+                            
+                        } else {
+                            // Para opciones que no son juegos (o juegos aún no implementados)
+                            Button(action: {
+                                print("Has tocado \(item.title)")
+                            }) {
+                                MenuItemRow(item: item)
+                            }
+                            .buttonStyle(PlainButtonStyle())
+                        }
+                    }
+                }
+                .padding()
+                .padding(.top, 10)
+            }
         }
+        // --- Estilo de la Barra de Navegación (Título "Lecturio") ---
+        // .navigationTitle("") // Se quita para usar el .principal
+        .toolbar {
+            ToolbarItem(placement: .principal) {
+                Text("Lecturio")
+                    .font(.system(.largeTitle, design: .rounded))
+                    .fontWeight(.heavy) // Bolder
+                    .foregroundColor(.white.opacity(0.9)) // Soft white
+                    .shadow(radius: 2) // Soft shadow for title
+            }
+        }
+        
+        // --- ¡CAMBIO EN EL TOOLBAR! ---
+        // Ahora el fondo de la barra de navegación también cambia
+        .toolbarBackground(
+            isDarkMode ?
+                // Fondo oscuro para la barra
+                LinearGradient(colors: [.black.opacity(0.8), .blue.opacity(0.3)], startPoint: .top, endPoint: .bottom) :
+                // Fondo claro (el que tenías)
+                LinearGradient(colors: [Color(red: 0.6, green: 0.9, blue: 1.0), .cyan], startPoint: .top, endPoint: .bottom),
+            for: .navigationBar)
+        .toolbarBackground(.visible, for: .navigationBar)
+        
         // --- ¡CAMBIO 3! ---
         // Este modificador aplica el modo oscuro (o lo quita)
         // a *todo* el NavigationStack (toda la app).
         .preferredColorScheme(isDarkMode ? .dark : nil)
+        
+        // Importante: Oculta el botón de "Atrás" para que no puedan
+        // regresar a la pantalla de inicio de sesión (inicioview).
+        .navigationBarBackButtonHidden(true)
     }
 }
 
@@ -213,7 +216,11 @@ struct MenuItemRow: View {
 }
 
 
+// --- Preview para 'contenttview' ---
+// Se actualizó para previsualizar 'contenttview'
+// dentro de un NavigationStack para que el título funcione.
 #Preview {
-    ContentView()
+    NavigationStack {
+        contenttview()
+    }
 }
-
