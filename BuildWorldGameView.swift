@@ -346,7 +346,7 @@ struct BuildWordGameView: View {
         // 5. Genera 6 opciones: las correctas + señuelos
         var options: [String] = correctLetters
         let alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ".map { String($0) }
-        let numDecoys = 6 - options.count
+        _ = 6 - options.count
         
         while options.count < 6 {
             let randomLetter = alphabet.randomElement()!

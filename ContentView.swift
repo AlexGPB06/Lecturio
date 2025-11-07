@@ -21,6 +21,9 @@ let menuItems: [MenuItem] = [
 ]
 
 
+
+// --- FIN DE VISTAS DE RELLENO ---
+
 // --- ¡NUEVA VISTA! ---
 // Esta es la vista para el fondo de noche con estrellas
 struct NightSkyView: View {
@@ -193,16 +196,11 @@ struct MenuItemCard: View { // Renombrado de MenuItemRow
         }
     }
 }
-
-
-// --- Preview para 'contenttview' ---
 #Preview {
     NavigationStack {
         contenttview()
     }
-    // Así puedes probarlo en un iPad:
-    .previewDevice("iPad Pro (11-inch) (4th generation)")
-    .previewDisplayName("iPad Preview")
+
 }
 
 

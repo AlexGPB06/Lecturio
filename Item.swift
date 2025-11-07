@@ -1,9 +1,4 @@
-//
-//  Item.swift
-//  Lecturio
-//
-//  Created by Alumno on 27/10/25.
-//
+
 
 import Foundation
 import SwiftData

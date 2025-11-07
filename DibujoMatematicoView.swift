@@ -58,7 +58,7 @@ let listaDeDibujos: [ElementoDibujo] = [
 /// Fuente personalizada para el estilo crayón
 func kirbyFont(size: CGFloat) -> Font {
     // Intenta usar Chalkduster, si no, usa una de sistema redondeada
-    return .custom("Chalkduster", size: size) ?? .system(size: size, weight: .bold, design: .rounded)
+    return .custom("Chalkduster", size: size)
 }
 
 /// Forma de borde irregular (Sketchy) para simular crayón
